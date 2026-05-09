@@ -1,1050 +1,115 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Medali — Livreur Étudiant</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #0e0e0e;
-    --surface: #161616;
-    --card: #1e1e1e;
-    --border: #2a2a2a;
-    --gold: #d4a843;
-    --gold-light: #f0c96a;
-    --gold-dim: rgba(212,168,67,0.15);
-    --text: #f0ece4;
-    --muted: #8a8480;
-    --accent: #e8d5a3;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* GRAIN OVERLAY */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 999;
-    opacity: 0.4;
-  }
-
-  /* LANG SWITCHER */
-  .lang-bar {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 100;
-    display: flex;
-    justify-content: flex-end;
-    gap: 6px;
-    padding: 14px 24px;
-    background: linear-gradient(to bottom, rgba(14,14,14,0.95), transparent);
-  }
-
-  .lang-btn {
-    background: var(--border);
-    border: 1px solid #333;
-    color: var(--muted);
-    padding: 5px 12px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-family: 'DM Sans', sans-serif;
-  }
-  .lang-btn:hover, .lang-btn.active {
-    background: var(--gold-dim);
-    border-color: var(--gold);
-    color: var(--gold);
-  }
-
-  /* HERO */
-  .hero {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 100px 24px 60px;
-    position: relative;
-  }
-
-  .hero::after {
-    content: '';
-    position: absolute;
-    bottom: 0; left: 50%; transform: translateX(-50%);
-    width: 1px; height: 60px;
-    background: linear-gradient(to bottom, var(--gold), transparent);
-  }
-
-  .avatar-ring {
-    width: 100px; height: 100px;
-    border-radius: 50%;
-    border: 2px solid var(--gold);
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 28px;
-    position: relative;
-    animation: pulse-ring 3s ease-in-out infinite;
-  }
-
-  @keyframes pulse-ring {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(212,168,67,0.4); }
-    50% { box-shadow: 0 0 0 16px rgba(212,168,67,0); }
-  }
-
-  .avatar-emoji { font-size: 52px; }
-
-  .hero-badge {
-    display: inline-block;
-    background: var(--gold-dim);
-    border: 1px solid rgba(212,168,67,0.3);
-    color: var(--gold);
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    padding: 5px 16px;
-    border-radius: 20px;
-    margin-bottom: 20px;
-  }
-
-  .hero h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(2.8rem, 7vw, 5.5rem);
-    font-weight: 900;
-    line-height: 1.05;
-    color: var(--text);
-    margin-bottom: 10px;
-  }
-
-  .hero h1 span { color: var(--gold); }
-
-  .hero-sub {
-    font-size: clamp(1rem, 2.5vw, 1.3rem);
-    color: var(--muted);
-    font-weight: 300;
-    margin-bottom: 16px;
-    max-width: 520px;
-  }
-
-  /* STORY SECTION */
-  .story {
-    max-width: 780px;
-    margin: 0 auto;
-    padding: 80px 24px;
-  }
-
-  .section-label {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .section-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
-
-  .story-text {
-    font-size: 1.1rem;
-    line-height: 1.9;
-    color: #c5bfb8;
-    font-weight: 300;
-  }
-  .story-text strong { color: var(--accent); font-weight: 500; }
-
-  /* STATS */
-  .stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-    max-width: 780px;
-    margin: 0 auto 80px;
-    padding: 0 24px;
-  }
-
-  .stat-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 28px 20px;
-    text-align: center;
-    transition: border-color 0.3s, transform 0.3s;
-  }
-  .stat-card:hover {
-    border-color: var(--gold);
-    transform: translateY(-4px);
-  }
-  .stat-num {
-    font-family: 'Playfair Display', serif;
-    font-size: 2.2rem;
-    font-weight: 700;
-    color: var(--gold);
-    line-height: 1;
-    margin-bottom: 8px;
-  }
-  .stat-label { font-size: 0.75rem; color: var(--muted); font-weight: 400; }
-
-  /* TIP SECTION */
-  .tip-section {
-    max-width: 780px;
-    margin: 0 auto;
-    padding: 0 24px 80px;
-  }
-
-  .tip-card {
-    background: linear-gradient(135deg, #1a1a1a 0%, #1e1c18 100%);
-    border: 1px solid rgba(212,168,67,0.25);
-    border-radius: 24px;
-    padding: 48px 40px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .tip-card::before {
-    content: '';
-    position: absolute;
-    top: -40%; left: 50%; transform: translateX(-50%);
-    width: 300px; height: 300px;
-    background: radial-gradient(circle, rgba(212,168,67,0.07) 0%, transparent 70%);
-    pointer-events: none;
-  }
-
-  .tip-card h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.9rem;
-    font-weight: 700;
-    margin-bottom: 12px;
-    color: var(--accent);
-  }
-
-  .tip-card p {
-    color: var(--muted);
-    font-size: 0.95rem;
-    line-height: 1.7;
-    max-width: 480px;
-    margin: 0 auto 32px;
-  }
-
-  .tip-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    background: var(--gold);
-    color: #0e0e0e;
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 1rem;
-    padding: 16px 36px;
-    border-radius: 100px;
-    transition: all 0.25s;
-    letter-spacing: 0.02em;
-  }
-  .tip-btn:hover {
-    background: var(--gold-light);
-    transform: scale(1.04);
-    box-shadow: 0 12px 40px rgba(212,168,67,0.35);
-  }
-
-  .revolut-icon { font-size: 1.3rem; }
-
-  .no-tip-text {
-    margin-top: 28px;
-    font-size: 0.82rem;
-    color: #4a4540;
-    font-style: italic;
-  }
-  .no-tip-text a {
-    color: #6a6360;
-    text-decoration: underline;
-    text-decoration-color: #333;
-    cursor: pointer;
-    transition: color 0.2s;
-  }
-  .no-tip-text a:hover { color: var(--muted); }
-
-  /* MESSAGE SECTION */
-  .message-section {
-    max-width: 780px;
-    margin: 0 auto;
-    padding: 0 24px 80px;
-  }
-
-  .message-box {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 36px;
-  }
-
-  .message-box h3 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.5rem;
-    color: var(--accent);
-    margin-bottom: 8px;
-  }
-  .message-box p { font-size: 0.88rem; color: var(--muted); margin-bottom: 24px; }
-
-  .msg-name-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 12px;
-  }
-
-  .msg-input, .msg-textarea {
-    width: 100%;
-    background: #111;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.9rem;
-    padding: 14px 18px;
-    outline: none;
-    transition: border-color 0.2s;
-    resize: none;
-  }
-  .msg-input:focus, .msg-textarea:focus { border-color: var(--gold); }
-  .msg-textarea { height: 110px; display: block; margin-bottom: 16px; }
-
-  .msg-submit {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.9rem;
-    font-weight: 600;
-    padding: 14px 28px;
-    cursor: pointer;
-    transition: all 0.2s;
-    width: 100%;
-  }
-  .msg-submit:hover { border-color: var(--gold); color: var(--gold); }
-
-  .msg-success {
-    display: none;
-    text-align: center;
-    padding: 20px;
-    color: var(--gold);
-    font-size: 1rem;
-    font-weight: 500;
-  }
-
-  /* LEADERBOARD */
-  .leaderboard-section {
-    max-width: 780px;
-    margin: 0 auto;
-    padding: 0 24px 80px;
-  }
-
-  .leaderboard-box {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    overflow: hidden;
-  }
-
-  .lb-header {
-    padding: 24px 28px 16px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .lb-header h3 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.3rem;
-    color: var(--accent);
-  }
-
-  .lb-admin-btn {
-    background: none;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    color: var(--muted);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.75rem;
-    padding: 6px 12px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .lb-admin-btn:hover { border-color: var(--gold); color: var(--gold); }
-
-  .lb-list { padding: 12px 0; }
-
-  .lb-entry {
-    display: flex;
-    align-items: center;
-    padding: 14px 28px;
-    gap: 16px;
-    border-bottom: 1px solid rgba(255,255,255,0.03);
-    transition: background 0.2s;
-  }
-  .lb-entry:hover { background: rgba(212,168,67,0.04); }
-  .lb-entry:last-child { border-bottom: none; }
-
-  .lb-rank {
-    width: 28px;
-    font-family: 'Playfair Display', serif;
-    font-size: 1.1rem;
-    font-weight: 700;
-    text-align: center;
-    flex-shrink: 0;
-  }
-  .lb-rank.r1 { color: #ffd700; }
-  .lb-rank.r2 { color: #c0c0c0; }
-  .lb-rank.r3 { color: #cd7f32; }
-  .lb-rank.rother { color: var(--muted); font-size: 0.85rem; }
-
-  .lb-name { flex: 1; font-weight: 500; font-size: 0.95rem; }
-  .lb-msg { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
-
-  .lb-amount {
-    font-family: 'Playfair Display', serif;
-    font-weight: 700;
-    color: var(--gold);
-    font-size: 1rem;
-    flex-shrink: 0;
-  }
-
-  .lb-empty {
-    text-align: center;
-    padding: 40px;
-    color: var(--muted);
-    font-size: 0.88rem;
-  }
-
-  /* ADMIN MODAL */
-  .modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.85);
-    z-index: 500;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-  }
-  .modal-overlay.open { display: flex; }
-
-  .modal {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    width: 100%;
-    max-width: 520px;
-    padding: 36px;
-    max-height: 90vh;
-    overflow-y: auto;
-  }
-
-  .modal h3 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.4rem;
-    color: var(--accent);
-    margin-bottom: 20px;
-  }
-
-  .modal-close {
-    float: right;
-    background: none;
-    border: none;
-    color: var(--muted);
-    font-size: 1.4rem;
-    cursor: pointer;
-    margin-top: -4px;
-  }
-
-  .modal-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr auto;
-    gap: 8px;
-    align-items: end;
-    margin-bottom: 10px;
-  }
-
-  .modal-input {
-    background: #111;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.82rem;
-    padding: 10px 12px;
-    outline: none;
-    width: 100%;
-  }
-  .modal-input:focus { border-color: var(--gold); }
-
-  .modal-del {
-    background: none;
-    border: 1px solid #333;
-    border-radius: 10px;
-    color: #666;
-    cursor: pointer;
-    padding: 10px 12px;
-    transition: all 0.2s;
-    font-size: 1rem;
-  }
-  .modal-del:hover { border-color: #c44; color: #c44; }
-
-  .modal-add {
-    background: var(--gold-dim);
-    border: 1px solid rgba(212,168,67,0.3);
-    border-radius: 10px;
-    color: var(--gold);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 600;
-    padding: 10px 20px;
-    cursor: pointer;
-    transition: all 0.2s;
-    width: 100%;
-    margin-top: 8px;
-  }
-  .modal-add:hover { background: var(--gold); color: #0e0e0e; }
-
-  .modal-pass {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-  }
-  .modal-pass .modal-input { flex: 1; }
-  .modal-pass-btn {
-    background: var(--gold-dim);
-    border: 1px solid rgba(212,168,67,0.3);
-    border-radius: 10px;
-    color: var(--gold);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 0.85rem;
-    font-weight: 600;
-    padding: 10px 20px;
-    cursor: pointer;
-    white-space: nowrap;
-  }
-
-  .modal-section-title {
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin: 16px 0 10px;
-  }
-
-  .modal-entries-list { margin-bottom: 12px; }
-
-  /* FOOTER */
-  footer {
-    text-align: center;
-    padding: 40px 24px 32px;
-    border-top: 1px solid var(--border);
-    color: var(--muted);
-    font-size: 0.78rem;
-  }
-  footer span { color: var(--gold); }
-
-  /* NICE MODAL FOR NO-TIP */
-  .kindword-modal {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.85);
-    z-index: 600;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-  }
-  .kindword-modal.open { display: flex; }
-
-  .kindword-box {
-    background: var(--surface);
-    border: 1px solid rgba(212,168,67,0.2);
-    border-radius: 20px;
-    padding: 40px;
-    max-width: 460px;
-    width: 100%;
-    text-align: center;
-  }
-  .kindword-box h3 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.6rem;
-    color: var(--accent);
-    margin-bottom: 12px;
-  }
-  .kindword-box p { color: var(--muted); font-size: 0.9rem; line-height: 1.7; margin-bottom: 24px; }
-  .kindword-close {
-    background: var(--gold-dim);
-    border: 1px solid rgba(212,168,67,0.3);
-    border-radius: 12px;
-    color: var(--gold);
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 600;
-    padding: 12px 28px;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-size: 0.9rem;
-  }
-  .kindword-close:hover { background: var(--gold); color: #0e0e0e; }
-
-  /* SCROLL ANIMATIONS */
-  .fade-in {
-    opacity: 0;
-    transform: translateY(24px);
-    transition: opacity 0.7s ease, transform 0.7s ease;
-  }
-  .fade-in.visible { opacity: 1; transform: none; }
-
-  @media (max-width: 600px) {
-    .stats { grid-template-columns: 1fr; }
-    .msg-name-row { grid-template-columns: 1fr; }
-    .modal-row { grid-template-columns: 1fr 1fr; }
-    .modal-row .modal-del { grid-column: span 2; }
-    .tip-card { padding: 36px 24px; }
-    .message-box { padding: 28px 20px; }
-  }
-</style>
-</head>
-<body>
-
-<!-- LANGUAGE BAR -->
-<div class="lang-bar">
-  <button class="lang-btn active" onclick="setLang('fr')">FR</button>
-  <button class="lang-btn" onclick="setLang('en')">EN</button>
-  <button class="lang-btn" onclick="setLang('de')">DE</button>
-</div>
-
-<!-- HERO -->
-<section class="hero">
-  <div class="avatar-ring"><div class="avatar-emoji">🚴</div></div>
-  <div class="hero-badge" data-i18n="badge">Livreur & Étudiant</div>
-  <h1 data-i18n="title">Bonjour, je suis<br><span>Medali</span></h1>
-  <p class="hero-sub" data-i18n="subtitle">étudiant le jour, Livreur la nuit  — chaque course compte.</p>
-</section>
-
-<!-- STORY -->
-<section class="story fade-in">
-  <div class="section-label" data-i18n="story-label">Mon Histoire</div>
-  <p class="story-text" data-i18n="story-text">
-    Je m'appelle <strong>Medali</strong> et je travaille comme livreur pour <strong>financer mes études</strong>. 
-    Ce n'est pas toujours facile — les longues heures sur la route, la météo capricieuse, les weekends passés à livrer pendant que d'autres se reposent. 
-    Mais je le fais avec <strong>fierté et motivation</strong>, parce que je crois en mon avenir.<br><br>
-    La livraison est mon <strong>seul revenu</strong>. Un simple pourboire, même petit, fait une énorme différence dans ma journée — et m'aide à continuer mes études sereinement.
-  </p>
-</section>
-
-<!-- STATS -->
-<div class="stats fade-in">
-  <div class="stat-card">
-    <div class="stat-num">100%</div>
-    <div class="stat-label" data-i18n="stat1">Engagement total</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-num">🎓</div>
-    <div class="stat-label" data-i18n="stat2">Étudiant à temps plein</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-num">❤️</div>
-    <div class="stat-label" data-i18n="stat3">Livré avec soin</div>
-  </div>
-</div>
-
-<!-- TIP SECTION -->
-<section class="tip-section fade-in">
-  <div class="section-label" data-i18n="tip-label">Pourboire</div>
-  <div class="tip-card">
-    <h2 data-i18n="tip-title">Vous avez aimé ma livraison ?</h2>
-    <p data-i18n="tip-desc">Un petit pourboire via Revolut me touche profondément et m'encourage à continuer. Merci pour votre générosité. 🙏</p>
-    <a href="https://revolut.me/medali_hy" target="_blank" class="tip-btn">
-      <span class="revolut-icon"></span>
-      <span data-i18n="tip-btn">Vous pouvez laisser un pourboire directement dans l’application Uber,
-ou, si vous préférez, via Revolut</span>
-    </a>
-    <p class="no-tip-text">
-      <span data-i18n="notip-pre">Pas de pourboire possible ? </span>
-      <a onclick="openKindword()" data-i18n="notip-link">Un message suffit 💬</a>
-    </p>
-  </div>
-</section>
-
-<!-- MESSAGE SECTION -->
-<section class="message-section fade-in">
-  <div class="section-label" data-i18n="msg-label">Message</div>
-  <div class="message-box">
-    <h3 data-i18n="msg-title">Laissez un mot 💬</h3>
-    <p data-i18n="msg-sub">Un message d'encouragement, ça va droit au cœur. Merci !</p>
-    <div class="msg-name-row">
-      <input class="msg-input" id="msgName" type="text" data-placeholder-i18n="msg-name-ph" placeholder="Votre prénom">
-      <input class="msg-input" id="msgAmount" type="text" data-placeholder-i18n="msg-amount-ph" placeholder="Montant (optionnel)">
-    </div>
-    <textarea class="msg-textarea" id="msgText" data-placeholder-i18n="msg-text-ph" placeholder="Votre message..."></textarea>
-    <button class="msg-submit" onclick="submitMessage()" data-i18n="msg-send">Envoyer le message</button>
-    <div class="msg-success" id="msgSuccess" data-i18n="msg-ok">✨ Merci pour votre message, ça réchauffe le cœur !</div>
-  </div>
-</section>
-
-<!-- LEADERBOARD -->
-<section class="leaderboard-section fade-in">
-  <div class="section-label" data-i18n="lb-label">Classement</div>
-  <div class="leaderboard-box">
-    <div class="lb-header">
-      <h3 data-i18n="lb-title">🏆 Hall of Kindness</h3>
-      <button class="lb-admin-btn" onclick="openAdmin()" data-i18n="lb-admin">Admin</button>
-    </div>
-    <div class="lb-list" id="lbList"></div>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer>
-  <p><span>Medali</span> — <span data-i18n="footer">Livreur & Étudiant avec passion</span></p>
-  <p style="margin-top:8px;font-size:0.7rem;color:#333" data-i18n="footer2">Fait avec ❤️ pour mes clients</p>
-</footer>
-
-<!-- KIND WORD MODAL -->
-<div class="kindword-modal" id="kindwordModal">
-  <div class="kindword-box">
-    <h3 data-i18n="kw-title">Pas de souci 😊</h3>
-    <p data-i18n="kw-text">Un simple mot gentil, un sourire, ou partager ce lien avec vos proches — ça compte autant qu'un pourboire pour moi. Merci d'avoir pris le temps de lire mon histoire. Je vous souhaite une excellente journée ! 🌟</p>
-    <button class="kindword-close" onclick="closeKindword()" data-i18n="kw-close">Fermer ✨</button>
-  </div>
-</div>
-
-<!-- ADMIN MODAL -->
-<div class="modal-overlay" id="adminModal">
-  <div class="modal">
-    <button class="modal-close" onclick="closeAdmin()">×</button>
-    <h3 data-i18n="admin-title">🔑 Gestion du classement</h3>
-    <div id="adminGate">
-      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:14px" data-i18n="admin-pass-label">Mot de passe :</p>
-      <div class="modal-pass">
-        <input class="modal-input" type="password" id="adminPass" placeholder="••••••">
-        <button class="modal-pass-btn" onclick="checkPass()" data-i18n="admin-unlock">Déverrouiller</button>
-      </div>
-      <p id="adminError" style="color:#c44;font-size:0.8rem;display:none" data-i18n="admin-error">Mot de passe incorrect.</p>
-    </div>
-    <div id="adminPanel" style="display:none">
-      <p class="modal-section-title" data-i18n="admin-entries">Entrées du classement</p>
-      <div class="modal-entries-list" id="adminEntries"></div>
-      <p class="modal-section-title" data-i18n="admin-add">Ajouter une entrée</p>
-      <div class="modal-row">
-        <input class="modal-input" id="newName" data-placeholder-i18n="admin-name-ph" placeholder="Prénom">
-        <input class="modal-input" id="newAmount" placeholder="5.00 CHF">
-        <input class="modal-input" id="newMsg" data-placeholder-i18n="admin-msg-ph" placeholder="Message">
-      </div>
-      <button class="modal-add" onclick="addEntry()" data-i18n="admin-add-btn">+ Ajouter</button>
-      <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:20px">
-        <p class="modal-section-title" data-i18n="admin-pass-change">Changer le mot de passe</p>
-        <div class="modal-pass">
-          <input class="modal-input" type="password" id="newPass" placeholder="Nouveau mdp">
-          <button class="modal-pass-btn" onclick="changePass()" data-i18n="admin-save-pass">Sauvegarder</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<script>
-// ── i18n ──────────────────────────────────────────────────────────────────
-const STRINGS = {
-  fr: {
-    badge: "Livreur & Étudiant",
-    title: `Bonjour, je suis<br><span>Medali</span>`,
-    subtitle: "Livreur le jour, étudiant la nuit — chaque course compte.",
-    "story-label": "Mon Histoire",
-    "story-text": `Je m'appelle <strong>Medali</strong> et je travaille comme livreur pour <strong>financer mes études</strong>. Ce n'est pas toujours facile — les longues heures sur la route, la météo capricieuse, les weekends passés à livrer pendant que d'autres se reposent. Mais je le fais avec <strong>fierté et motivation</strong>, parce que je crois en mon avenir.<br><br>La livraison est mon <strong>seul revenu</strong>. Un simple pourboire, même petit, fait une énorme différence dans ma journée — et m'aide à continuer mes études sereinement.`,
-    stat1: "Engagement total", stat2: "Étudiant à temps plein", stat3: "Livré avec soin",
-    "tip-label": "Pourboire",
-    "tip-title": "Vous avez aimé ma livraison ?",
-    "tip-desc": "Un petit pourboire via Revolut me touche profondément et m'encourage à continuer. Merci pour votre générosité. 🙏",
-    "tip-btn": "Donner un pourboire via Revolut",
-    "notip-pre": "Pas de pourboire possible ? ",
-    "notip-link": "Un message suffit 💬",
-    "msg-label": "Message",
-    "msg-title": "Laissez un mot 💬",
-    "msg-sub": "Un message d'encouragement, ça va droit au cœur. Merci !",
-    "msg-name-ph": "Votre prénom",
-    "msg-amount-ph": "Montant (optionnel)",
-    "msg-text-ph": "Votre message...",
-    "msg-send": "Envoyer le message",
-    "msg-ok": "✨ Merci pour votre message, ça réchauffe le cœur !",
-    "lb-label": "Classement", "lb-title": "🏆 Hall of Kindness", "lb-admin": "Admin",
-    "kw-title": "Pas de souci 😊",
-    "kw-text": "Un simple mot gentil, un sourire, ou partager ce lien avec vos proches — ça compte autant qu'un pourboire pour moi. Merci d'avoir pris le temps de lire mon histoire. Je vous souhaite une excellente journée ! 🌟",
-    "kw-close": "Fermer ✨",
-    "admin-title": "🔑 Gestion du classement",
-    "admin-pass-label": "Mot de passe :",
-    "admin-unlock": "Déverrouiller",
-    "admin-error": "Mot de passe incorrect.",
-    "admin-entries": "Entrées du classement",
-    "admin-add": "Ajouter une entrée",
-    "admin-name-ph": "Prénom",
-    "admin-msg-ph": "Message",
-    "admin-add-btn": "+ Ajouter",
-    "admin-pass-change": "Changer le mot de passe",
-    "admin-save-pass": "Sauvegarder",
-    footer: "Livreur & Étudiant avec passion",
-    footer2: "Fait avec ❤️ pour mes clients"
-  },
-  en: {
-    badge: "Delivery Driver & Student",
-    title: `Hi, I'm<br><span>Medali</span>`,
-    subtitle: "Delivering by day, studying by night — every ride matters.",
-    "story-label": "My Story",
-    "story-text": `My name is <strong>Medali</strong> and I work as a delivery driver to <strong>fund my studies</strong>. It's not always easy — the long hours on the road, unpredictable weather, weekends spent delivering while others rest. But I do it with <strong>pride and determination</strong>, because I believe in my future.<br><br>Delivery is my <strong>only income</strong>. A simple tip, even a small one, makes a huge difference in my day — and helps me continue my studies with peace of mind.`,
-    stat1: "Full commitment", stat2: "Full-time student", stat3: "Delivered with care",
-    "tip-label": "Tip",
-    "tip-title": "Did you enjoy my delivery?",
-    "tip-desc": "A small tip via Revolut means the world to me and encourages me to keep going. Thank you so much. 🙏",
-    "tip-btn": "Leave a tip via Revolut",
-    "notip-pre": "Can't tip right now? ",
-    "notip-link": "A kind word goes a long way 💬",
-    "msg-label": "Message",
-    "msg-title": "Leave a note 💬",
-    "msg-sub": "An encouraging word goes straight to my heart. Thank you!",
-    "msg-name-ph": "Your first name",
-    "msg-amount-ph": "Amount (optional)",
-    "msg-text-ph": "Your message...",
-    "msg-send": "Send message",
-    "msg-ok": "✨ Thank you for your message, it truly warms my heart!",
-    "lb-label": "Leaderboard", "lb-title": "🏆 Hall of Kindness", "lb-admin": "Admin",
-    "kw-title": "No worries 😊",
-    "kw-text": "A kind word, a smile, or sharing this link with a friend — it means just as much as a tip to me. Thank you for taking the time to read my story. Have a wonderful day! 🌟",
-    "kw-close": "Close ✨",
-    "admin-title": "🔑 Leaderboard Management",
-    "admin-pass-label": "Password:",
-    "admin-unlock": "Unlock",
-    "admin-error": "Incorrect password.",
-    "admin-entries": "Leaderboard entries",
-    "admin-add": "Add an entry",
-    "admin-name-ph": "First name",
-    "admin-msg-ph": "Message",
-    "admin-add-btn": "+ Add",
-    "admin-pass-change": "Change password",
-    "admin-save-pass": "Save",
-    footer: "Delivery Driver & Student with passion",
-    footer2: "Made with ❤️ for my customers"
-  },
-  de: {
-    badge: "Lieferfahrer & Student",
-    title: `Hallo, ich bin<br><span>Medali</span>`,
-    subtitle: "Tagsüber Lieferfahrer, nachts Student — jede Fahrt zählt.",
-    "story-label": "Meine Geschichte",
-    "story-text": `Mein Name ist <strong>Medali</strong> und ich arbeite als Lieferfahrer, um <strong>mein Studium zu finanzieren</strong>. Es ist nicht immer einfach — die langen Stunden auf der Straße, das wechselhafte Wetter, die Wochenenden auf der Arbeit. Aber ich mache es mit <strong>Stolz und Motivation</strong>, denn ich glaube an meine Zukunft.<br><br>Die Lieferarbeit ist mein <strong>einziges Einkommen</strong>. Ein kleines Trinkgeld, auch ein kleines, macht einen riesigen Unterschied in meinem Tag — und hilft mir, mein Studium ruhig fortzusetzen.`,
-    stat1: "Voller Einsatz", stat2: "Vollzeitstudent", stat3: "Mit Sorgfalt geliefert",
-    "tip-label": "Trinkgeld",
-    "tip-title": "Hat Ihnen meine Lieferung gefallen?",
-    "tip-desc": "Ein kleines Trinkgeld über Revolut bedeutet mir sehr viel und ermutigt mich weiterzumachen. Vielen Dank für Ihre Großzügigkeit. 🙏",
-    "tip-btn": "Trinkgeld über Revolut geben",
-    "notip-pre": "Kein Trinkgeld möglich? ",
-    "notip-link": "Eine nette Nachricht reicht 💬",
-    "msg-label": "Nachricht",
-    "msg-title": "Hinterlassen Sie eine Nachricht 💬",
-    "msg-sub": "Eine aufmunternde Nachricht geht direkt zu Herzen. Danke!",
-    "msg-name-ph": "Ihr Vorname",
-    "msg-amount-ph": "Betrag (optional)",
-    "msg-text-ph": "Ihre Nachricht...",
-    "msg-send": "Nachricht senden",
-    "msg-ok": "✨ Danke für Ihre Nachricht, das wärmt mein Herz!",
-    "lb-label": "Rangliste", "lb-title": "🏆 Hall of Kindness", "lb-admin": "Admin",
-    "kw-title": "Kein Problem 😊",
-    "kw-text": "Ein freundliches Wort, ein Lächeln, oder diesen Link mit Freunden teilen — das bedeutet mir genauso viel wie ein Trinkgeld. Danke, dass Sie sich die Zeit genommen haben, meine Geschichte zu lesen. Ich wünsche Ihnen einen wunderschönen Tag! 🌟",
-    "kw-close": "Schließen ✨",
-    "admin-title": "🔑 Rangliste verwalten",
-    "admin-pass-label": "Passwort:",
-    "admin-unlock": "Entsperren",
-    "admin-error": "Falsches Passwort.",
-    "admin-entries": "Ranglisten-Einträge",
-    "admin-add": "Eintrag hinzufügen",
-    "admin-name-ph": "Vorname",
-    "admin-msg-ph": "Nachricht",
-    "admin-add-btn": "+ Hinzufügen",
-    "admin-pass-change": "Passwort ändern",
-    "admin-save-pass": "Speichern",
-    footer: "Lieferfahrer & Student mit Leidenschaft",
-    footer2: "Mit ❤️ für meine Kunden gemacht"
-  }
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { 
+  getDatabase, ref, push, set, onValue, update, remove 
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA9aWjnTJm4ilmNZFjl9d5UjelOwEgMGw4",
+  authDomain: "pourboire-5dfc1.firebaseapp.com",
+  projectId: "pourboire-5dfc1",
+  storageBucket: "pourboire-5dfc1.firebasestorage.app",
+  messagingSenderId: "515863407661",
+  appId: "1:515863407661:web:abdc07681d10a09a779ca4",
+  measurementId: "G-K2N0K0YB07",
+  databaseURL: "https://pourboire-5dfc1-default-rtdb.europe-west1.firebasedatabase.app"
 };
 
-let currentLang = 'fr';
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
-function setLang(lang) {
-  currentLang = lang;
-  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent.trim().toLowerCase() === lang));
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    if (STRINGS[lang][key] !== undefined) el.innerHTML = STRINGS[lang][key];
-  });
-  document.querySelectorAll('[data-placeholder-i18n]').forEach(el => {
-    const key = el.getAttribute('data-placeholder-i18n');
-    if (STRINGS[lang][key] !== undefined) el.placeholder = STRINGS[lang][key];
-  });
-  document.documentElement.lang = lang;
-}
-
-// ── LEADERBOARD ───────────────────────────────────────────────────────────
-const ADMIN_PASS_KEY = 'medali_pass';
-const LB_KEY = 'medali_lb';
-const DEFAULT_PASS = 'medali@9591';
-
-function getPass() { return localStorage.getItem(ADMIN_PASS_KEY) || DEFAULT_PASS; }
-function getLb() { return JSON.parse(localStorage.getItem(LB_KEY) || '[]'); }
-function saveLb(data) { localStorage.setItem(LB_KEY, JSON.stringify(data)); }
-
+// Références Firebase
+const lbRef = ref(db, "leaderboard");
+const msgRef = ref(db, "messages");
+const passRef = ref(db, "adminPass");
+</script>
 function renderLb() {
-  const list = getLb().sort((a,b) => parseFloat(b.amount||0) - parseFloat(a.amount||0));
-  const el = document.getElementById('lbList');
-  if (!list.length) {
-    el.innerHTML = `<div class="lb-empty" data-i18n="lb-empty">Soyez le premier à apparaître ici ! 🌟</div>`;
-    return;
-  }
-  const medals = ['r1','r2','r3'];
-  const nums = ['🥇','🥈','🥉'];
-  el.innerHTML = list.map((e,i) => {
-    const cls = i < 3 ? medals[i] : 'rother';
-    const icon = i < 3 ? nums[i] : `${i+1}`;
-    return `<div class="lb-entry">
-      <div class="lb-rank ${cls}">${icon}</div>
-      <div>
-        <div class="lb-name">${e.name}</div>
-        ${e.msg ? `<div class="lb-msg">"${e.msg}"</div>` : ''}
-      </div>
-      <div class="lb-amount">${e.amount ? e.amount+' CHF' : '💬'}</div>
-    </div>`;
-  }).join('');
-}
+  onValue(lbRef, (snapshot) => {
+    const data = snapshot.val() || {};
+    const list = Object.values(data).sort((a,b) => parseFloat(b.amount||0) - parseFloat(a.amount||0));
 
-// ── MESSAGE FORM ──────────────────────────────────────────────────────────
+    const el = document.getElementById('lbList');
+    if (!list.length) {
+      el.innerHTML = `<div class="lb-empty">Soyez le premier à apparaître ici ! 🌟</div>`;
+      return;
+    }
+
+    const medals = ['r1','r2','r3'];
+    const nums = ['🥇','🥈','🥉'];
+
+    el.innerHTML = list.map((e,i) => {
+      const cls = i < 3 ? medals[i] : 'rother';
+      const icon = i < 3 ? nums[i] : `${i+1}`;
+      return `
+        <div class="lb-entry">
+          <div class="lb-rank ${cls}">${icon}</div>
+          <div>
+            <div class="lb-name">${e.name}</div>
+            ${e.msg ? `<div class="lb-msg">"${e.msg}"</div>` : ''}
+          </div>
+          <div class="lb-amount">${e.amount ? e.amount+' CHF' : '💬'}</div>
+        </div>`;
+    }).join('');
+  });
+}
 function submitMessage() {
   const name = document.getElementById('msgName').value.trim();
   const amount = document.getElementById('msgAmount').value.trim();
   const msg = document.getElementById('msgText').value.trim();
+
   if (!name || !msg) return;
 
-  const lb = getLb();
-  lb.push({ name, amount, msg });
-  saveLb(lb);
-  renderLb();
+  push(msgRef, { name, amount, msg, date: Date.now() });
 
   document.getElementById('msgName').value = '';
   document.getElementById('msgAmount').value = '';
   document.getElementById('msgText').value = '';
+
   const suc = document.getElementById('msgSuccess');
   suc.style.display = 'block';
-  setTimeout(() => suc.style.display = 'none', 4000);
+  setTimeout(() => suc.style.display = 'none', 3000);
 }
-
-// ── ADMIN ─────────────────────────────────────────────────────────────────
-function openAdmin() {
-  document.getElementById('adminModal').classList.add('open');
-  document.getElementById('adminPanel').style.display = 'none';
-  document.getElementById('adminGate').style.display = 'block';
-  document.getElementById('adminPass').value = '';
-  document.getElementById('adminError').style.display = 'none';
-}
-function closeAdmin() { document.getElementById('adminModal').classList.remove('open'); }
-
 function checkPass() {
-  const v = document.getElementById('adminPass').value;
-  if (v === getPass()) {
-    document.getElementById('adminGate').style.display = 'none';
-    document.getElementById('adminPanel').style.display = 'block';
-    renderAdminEntries();
-  } else {
-    document.getElementById('adminError').style.display = 'block';
-  }
+  const input = document.getElementById('adminPass').value.trim();
+  onValue(passRef, (snapshot) => {
+    const real = snapshot.val() || "medali@9591";
+    if (input === real) {
+      document.getElementById('adminGate').style.display = 'none';
+      document.getElementById('adminPanel').style.display = 'block';
+      loadAdminEntries();
+    } else {
+      document.getElementById('adminError').style.display = 'block';
+    }
+  });
 }
 
-function renderAdminEntries() {
-  const lb = getLb();
-  const el = document.getElementById('adminEntries');
-  if (!lb.length) { el.innerHTML = '<p style="color:var(--muted);font-size:0.82rem">Aucune entrée.</p>'; return; }
-  el.innerHTML = lb.map((e,i) => `
-    <div class="modal-row" style="margin-bottom:8px">
-      <input class="modal-input" value="${e.name}" onchange="updateEntry(${i},'name',this.value)">
-      <input class="modal-input" value="${e.amount||''}" placeholder="CHF" onchange="updateEntry(${i},'amount',this.value)">
-      <input class="modal-input" value="${e.msg||''}" placeholder="msg" onchange="updateEntry(${i},'msg',this.value)">
-      <button class="modal-del" onclick="delEntry(${i})">🗑</button>
-    </div>`).join('');
-}
+function loadAdminEntries() {
+  onValue(lbRef, (snapshot) => {
+    const data = snapshot.val() || {};
+    const container = document.getElementById('adminEntries');
+    container.innerHTML = "";
 
-function updateEntry(i, key, val) {
-  const lb = getLb();
-  lb[i][key] = val;
-  saveLb(lb);
-  renderLb();
-}
-
-function delEntry(i) {
-  const lb = getLb();
-  lb.splice(i, 1);
-  saveLb(lb);
-  renderLb();
-  renderAdminEntries();
+    Object.entries(data).forEach(([id, entry]) => {
+      container.innerHTML += `
+        <div class="modal-row">
+          <input class="modal-input" value="${entry.name}" id="name-${id}">
+          <input class="modal-input" value="${entry.amount}" id="amount-${id}">
+          <input class="modal-input" value="${entry.msg}" id="msg-${id}">
+          <button class="modal-del" onclick="deleteEntry('${id}')">🗑️</button>
+        </div>
+      `;
+    });
+  });
 }
 
 function addEntry() {
   const name = document.getElementById('newName').value.trim();
   const amount = document.getElementById('newAmount').value.trim();
   const msg = document.getElementById('newMsg').value.trim();
-  if (!name) return;
-  const lb = getLb();
-  lb.push({ name, amount, msg });
-  saveLb(lb);
-  renderLb();
-  renderAdminEntries();
-  document.getElementById('newName').value = '';
-  document.getElementById('newAmount').value = '';
-  document.getElementById('newMsg').value = '';
+
+  push(lbRef, { name, amount, msg });
 }
 
-function changePass() {
-  const v = document.getElementById('newPass').value.trim();
-  if (v) { localStorage.setItem(ADMIN_PASS_KEY, v); document.getElementById('newPass').value = ''; alert('✅ Mot de passe mis à jour.'); }
+function deleteEntry(id) {
+  remove(ref(db, "leaderboard/" + id));
 }
-
-// ── KIND WORD MODAL ───────────────────────────────────────────────────────
-function openKindword() { document.getElementById('kindwordModal').classList.add('open'); }
-function closeKindword() { document.getElementById('kindwordModal').classList.remove('open'); }
-
-// close modals on overlay click
-document.getElementById('adminModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeAdmin(); });
-document.getElementById('kindwordModal').addEventListener('click', e => { if (e.target === e.currentTarget) closeKindword(); });
-
-// ── SCROLL ANIMATIONS ─────────────────────────────────────────────────────
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-}, { threshold: 0.12 });
-document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
-
-// ── INIT ──────────────────────────────────────────────────────────────────
-renderLb();
-setLang('fr');
-</script>
-</body>
-</html>
