@@ -1,32 +1,7 @@
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { 
-  getDatabase, ref, push, set, onValue, update, remove 
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyA9aWjnTJm4ilmNZFjl9d5UjelOwEgMGw4",
-  authDomain: "pourboire-5dfc1.firebaseapp.com",
-  projectId: "pourboire-5dfc1",
-  storageBucket: "pourboire-5dfc1.firebasestorage.app",
-  messagingSenderId: "515863407661",
-  appId: "1:515863407661:web:abdc07681d10a09a779ca4",
-  measurementId: "G-K2N0K0YB07",
-  databaseURL: "https://pourboire-5dfc1-default-rtdb.europe-west1.firebasedatabase.app"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-// Références Firebase
-const lbRef = ref(db, "leaderboard");
-const msgRef = ref(db, "messages");
-const passRef = ref(db, "adminPass");
-</script>
 function renderLb() {
   onValue(lbRef, (snapshot) => {
     const data = snapshot.val() || {};
-    const list = Object.values(data).sort((a,b) => parseFloat(b.amount||0) - parseFloat(a.amount||0));
+    const list = Object.values(data).sort((a, b) => parseFloat(b.amount || 0) - parseFloat(a.amount || 0));
 
     const el = document.getElementById('lbList');
     if (!list.length) {
@@ -47,28 +22,29 @@ function renderLb() {
             <div class="lb-name">${e.name}</div>
             ${e.msg ? `<div class="lb-msg">"${e.msg}"</div>` : ''}
           </div>
-          <div class="lb-amount">${e.amount ? e.amount+' CHF' : '💬'}</div>
+          <div class="lb-amount">${e.amount ? e.amount+' CHF' : '💨'}</div>
         </div>`;
-    }).join('');
+    }).join("");
   });
 }
+
 function submitMessage() {
   const name = document.getElementById('msgName').value.trim();
   const amount = document.getElementById('msgAmount').value.trim();
   const msg = document.getElementById('msgText').value.trim();
-
   if (!name || !msg) return;
 
   push(msgRef, { name, amount, msg, date: Date.now() });
 
-  document.getElementById('msgName').value = '';
-  document.getElementById('msgAmount').value = '';
-  document.getElementById('msgText').value = '';
+  document.getElementById('msgName').value = "";
+  document.getElementById('msgAmount').value = "";
+  document.getElementById('msgText').value = "";
 
   const suc = document.getElementById('msgSuccess');
   suc.style.display = 'block';
-  setTimeout(() => suc.style.display = 'none', 3000);
+  setTimeout(()=> suc.style.display = 'none', 3000);
 }
+
 function checkPass() {
   const input = document.getElementById('adminPass').value.trim();
   onValue(passRef, (snapshot) => {
@@ -88,7 +64,6 @@ function loadAdminEntries() {
     const data = snapshot.val() || {};
     const container = document.getElementById('adminEntries');
     container.innerHTML = "";
-
     Object.entries(data).forEach(([id, entry]) => {
       container.innerHTML += `
         <div class="modal-row">
@@ -96,8 +71,7 @@ function loadAdminEntries() {
           <input class="modal-input" value="${entry.amount}" id="amount-${id}">
           <input class="modal-input" value="${entry.msg}" id="msg-${id}">
           <button class="modal-del" onclick="deleteEntry('${id}')">🗑️</button>
-        </div>
-      `;
+        </div>`;
     });
   });
 }
@@ -106,7 +80,6 @@ function addEntry() {
   const name = document.getElementById('newName').value.trim();
   const amount = document.getElementById('newAmount').value.trim();
   const msg = document.getElementById('newMsg').value.trim();
-
   push(lbRef, { name, amount, msg });
 }
 
