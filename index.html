@@ -48,7 +48,7 @@
 
     <!-- FORMULAIRE MESSAGE -->
     <h2>Envoyer un message</h2>
-    <form action="https://formspree.io/f/mzdojwdq" method="POST">
+    <form action="https://formspree.io/f/TON_ID_FORMSPREE" method="POST">
       <input type="text" name="nom" placeholder="Ton nom" required>
       <textarea name="message" placeholder="Ton message" rows="4" required></textarea>
       <button type="submit">Envoyer</button>
@@ -67,18 +67,18 @@
 
   <!-- FIREBASE -->
   <script type="module">
-    // 🔥 1) COLLE ICI TA CONFIG FIREBASE
+    // 🔥 CONFIG FIREBASE DE MOH (déjà intégrée)
     const firebaseConfig = {
-      apiKey: "TON_API_KEY",
-      authDomain: "TON_PROJET.firebaseapp.com",
-      databaseURL: "https://TON_PROJET-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "TON_PROJET",
-      storageBucket: "TON_PROJET.appspot.com",
-      messagingSenderId: "TON_SENDER_ID",
-      appId: "TON_APP_ID"
+      apiKey: "AIzaSyA9aWjnTJm4ilmNZFjl9d5UjelOwEgMGw4",
+      authDomain: "pourboire-5dfc1.firebaseapp.com",
+      projectId: "pourboire-5dfc1",
+      storageBucket: "pourboire-5dfc1.firebasestorage.app",
+      messagingSenderId: "515863407661",
+      appId: "1:515863407661:web:abdc07681d10a09a779ca4",
+      measurementId: "G-K2N0K0YB07",
+      databaseURL: "https://pourboire-5dfc1-default-rtdb.europe-west1.firebasedatabase.app"
     };
 
-    // 🚀 NE TOUCHE PLUS À PARTIR D’ICI
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import {
       getDatabase, ref, push, onValue
