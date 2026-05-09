@@ -6,66 +6,39 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: Arial, sans-serif;
       background: #111;
-      color: #f5f5f5;
+      color: #fff;
       margin: 0;
       padding: 20px;
     }
-    h1, h2 {
-      text-align: center;
-    }
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-    }
+    h1, h2 { text-align: center; }
+    .container { max-width: 600px; margin: auto; }
     form {
       background: #1c1c1c;
       padding: 15px;
       border-radius: 8px;
       margin-bottom: 20px;
     }
-    label {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 0.9rem;
-    }
     input, textarea, button {
       width: 100%;
-      padding: 8px;
+      padding: 10px;
       margin-bottom: 10px;
       border-radius: 6px;
-      border: 1px solid #444;
-      background: #000;
-      color: #f5f5f5;
-      font-size: 0.95rem;
-    }
-    button {
-      background: #0d6efd;
       border: none;
-      cursor: pointer;
-      font-weight: 600;
+      font-size: 1rem;
     }
-    button:hover {
-      background: #0b5ed7;
-    }
-    ul {
-      list-style: none;
-      padding: 0;
-    }
+    input, textarea { background: #000; color: #fff; }
+    button { background: #0d6efd; color: #fff; cursor: pointer; }
+    button:hover { background: #0b5ed7; }
+    ul { list-style: none; padding: 0; }
     li {
       background: #1c1c1c;
-      margin-bottom: 6px;
-      padding: 8px;
+      padding: 10px;
       border-radius: 6px;
+      margin-bottom: 6px;
       display: flex;
       justify-content: space-between;
-    }
-    .small {
-      font-size: 0.8rem;
-      color: #aaa;
-      text-align: center;
-      margin-top: 10px;
     }
   </style>
 </head>
@@ -73,43 +46,28 @@
   <div class="container">
     <h1>Page de pourboire</h1>
 
-    <!-- FORMULAIRE MESSAGE (Formspree) -->
+    <!-- FORMULAIRE MESSAGE -->
     <h2>Envoyer un message</h2>
-    <form id="contact-form" action="https://formspree.io/f/TON_ID_FORMSPREE" method="POST">
-      <label for="nom">Ton nom</label>
-      <input type="text" id="nom" name="nom" required>
-
-      <label for="message">Message</label>
-      <textarea id="message" name="message" rows="4" required></textarea>
-
-      <button type="submit">Envoyer le message</button>
+    <form action="https://formspree.io/f/TON_ID_FORMSPREE" method="POST">
+      <input type="text" name="nom" placeholder="Ton nom" required>
+      <textarea name="message" placeholder="Ton message" rows="4" required></textarea>
+      <button type="submit">Envoyer</button>
     </form>
-    <p class="small">Les messages te seront envoyés par email via Formspree.</p>
 
-    <!-- CLASSEMENT (Firebase) -->
+    <!-- CLASSEMENT -->
     <h2>Classement</h2>
     <form id="score-form">
-      <label for="pseudo">Pseudo</label>
-      <input type="text" id="pseudo" required>
-
-      <label for="points">Points</label>
-      <input type="number" id="points" required>
-
-      <button type="submit">Ajouter au classement</button>
+      <input type="text" id="pseudo" placeholder="Pseudo" required>
+      <input type="number" id="points" placeholder="Points" required>
+      <button type="submit">Ajouter</button>
     </form>
 
     <ul id="score-list"></ul>
-    <p class="small">Le classement est partagé entre tous les utilisateurs (Firebase).</p>
   </div>
 
-  <!-- SCRIPT FIREBASE + CLASSEMENT -->
+  <!-- FIREBASE -->
   <script type="module">
-    // ⚠️ 1) COLLE ICI TA CONFIG FIREBASE
-    // Va sur https://console.firebase.google.com
-    // - Crée un projet
-    // - Ajoute une appli Web
-    // - Copie le bloc "firebaseConfig" et remplace ci-dessous
-
+    // 🔥 1) COLLE ICI TA CONFIG FIREBASE
     const firebaseConfig = {
       apiKey: "TON_API_KEY",
       authDomain: "TON_PROJET.firebaseapp.com",
@@ -120,14 +78,10 @@
       appId: "TON_APP_ID"
     };
 
-    // ⚠️ NE TOUCHE PLUS À PARTIR D’ICI (juste copier-coller)
-
+    // 🚀 NE TOUCHE PLUS À PARTIR D’ICI
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import {
-      getDatabase,
-      ref,
-      push,
-      onValue
+      getDatabase, ref, push, onValue
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
     const app = initializeApp(firebaseConfig);
@@ -140,39 +94,26 @@
     // Ajouter un score
     scoreForm.addEventListener("submit", (e) => {
       e.preventDefault();
-      const pseudoInput = document.getElementById("pseudo");
-      const pointsInput = document.getElementById("points");
-
-      const pseudo = pseudoInput.value.trim();
-      const points = Number(pointsInput.value);
+      const pseudo = document.getElementById("pseudo").value.trim();
+      const points = Number(document.getElementById("points").value);
 
       if (!pseudo || isNaN(points)) return;
 
-      push(scoresRef, {
-        pseudo,
-        points: points,
-        createdAt: Date.now()
-      });
+      push(scoresRef, { pseudo, points, createdAt: Date.now() });
 
-      pseudoInput.value = "";
-      pointsInput.value = "";
+      document.getElementById("pseudo").value = "";
+      document.getElementById("points").value = "";
     });
 
-    // Afficher le classement en temps réel
+    // Afficher le classement
     onValue(scoresRef, (snapshot) => {
       const data = snapshot.val() || {};
-      const entries = Object.values(data);
-
-      // Tri par points décroissants
-      entries.sort((a, b) => b.points - a.points);
+      const entries = Object.values(data).sort((a, b) => b.points - a.points);
 
       scoreList.innerHTML = "";
-      entries.forEach((item, index) => {
+      entries.forEach((item, i) => {
         const li = document.createElement("li");
-        li.innerHTML = `
-          <span>#${index + 1} - ${item.pseudo}</span>
-          <span>${item.points} pts</span>
-        `;
+        li.innerHTML = `<span>#${i + 1} - ${item.pseudo}</span><span>${item.points} pts</span>`;
         scoreList.appendChild(li);
       });
     });
